@@ -1,47 +1,39 @@
 package com.example.lab_week_10
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.lab_week_10.ui.theme.LAB_WEEK_10Theme
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    // Inisialisasi ViewModel
+    private val viewModel by lazy {
+        ViewModelProvider(this)[TotalViewModel::class.java]
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            LAB_WEEK_10Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
+        setContentView(R.layout.activity_main)
+
+        prepareViewModel()
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private fun updateText(total: Int) {
+        findViewById<TextView>(R.id.text_total).text =
+            getString(R.string.text_total, total)
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    LAB_WEEK_10Theme {
-        Greeting("Android")
+    private fun prepareViewModel() {
+        // Observe LiveData dari ViewModel
+        viewModel.total.observe(this) { total ->
+            updateText(total)
+        }
+
+        // Button klik untuk menaikkan total
+        findViewById<Button>(R.id.button_increment).setOnClickListener {
+            viewModel.incrementTotal()
+        }
     }
 }
